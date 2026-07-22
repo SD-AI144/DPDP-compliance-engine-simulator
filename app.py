@@ -1,82 +1,97 @@
 import streamlit as st
 from fastapi.testclient import TestClient
-from main import app  # Imports your existing FastAPI application
+from main import app
+import time # Used to simulate the "thinking" animation
 
-# Initialize the in-memory client
-# This calls your API logic directly without needing a separate uvicorn server!
 client = TestClient(app)
 
-# --- UI Configuration ---
-st.set_page_config(page_title="DPDP Erasure Simulator", page_icon="⚖️", layout="centered")
+# --- UI Configuration (Wide layout for dashboard feel) ---
+st.set_page_config(page_title="DPDP Compliance Engine", page_icon="🛡️", layout="wide")
 
-st.title("⚖️ DPDP Consent & Erasure Engine")
-st.markdown("""
-Simulate a Data Principal requesting erasure under **Section 6(4)** of the DPDP Act. 
-The engine will evaluate the request against active operations and statutory retention mandates (PMLA, CGST, Companies Act).
-""")
-
-st.divider()
-
-# --- Input Form ---
-st.subheader("1. Request Details")
-
-col1, col2 = st.columns(2)
-with col1:
-    user_id = st.text_input("User ID", value="user_REF_9901", help="Enter a mock user ID mapped in your database.")
-with col2:
+# --- Sidebar (The Control Panel) ---
+with st.sidebar:
+    st.title("⚙️ Control Panel")
+    st.markdown("Simulate a Data Principal's erasure request under **Sec 6(4)**.")
+    st.divider()
+    
+    user_id = st.text_input("Data Principal ID", value="user_REF_9901")
     record_type = st.selectbox(
-        "Target Record Type",
+        "Target Data Category",
         [
             "live_order_data",
             "marketing_profile", 
             "pmla_identity_log", 
             "gst_invoice_record",
             "corporate_books"
-        ],
-        help="Select the category of data the user wants deleted."
+        ]
     )
+    st.divider()
+    submit_btn = st.button("Execute Erasure Engine", type="primary", use_container_width=True)
 
-st.write("") # Spacer
+# --- Main Dashboard Area ---
+st.title("🛡️ DPDP 2027 Automated Triage Dashboard")
+st.markdown("Live monitoring of statutory conflicts and data erasure queues.")
 
-# --- Execution ---
-if st.button("Submit Erasure Request (Sec 6(4))", type="primary", use_container_width=True):
+# Add fake enterprise metrics to make it look like a production system
+col1, col2, col3 = st.columns(3)
+col1.metric(label="Total Erasure Requests (30d)", value="14,204", delta="Active")
+col2.metric(label="Statutory Preservations", value="3,842", delta="PMLA / CGST", delta_color="off")
+col3.metric(label="Escalated to Legal Review", value="12", delta="-3 Resolved", delta_color="inverse")
+
+st.divider()
+
+# --- Execution & Animation ---
+if submit_btn:
+    payload = {"user_id": user_id, "record_type": record_type}
     
-    payload = {
-        "user_id": user_id,
-        "record_type": record_type
-    }
-    
-    with st.spinner("Evaluating statutory conflicts..."):
-        # We hit the FastAPI endpoint in-memory
+    # This creates a visually impressive "Thinking" dropdown
+    with st.status("Initializing Statutory Decision Engine...", expanded=True) as status:
+        st.write("🔍 **Gate 1:** Querying active operational dependencies (Sec 6(5)/(6))...")
+        time.sleep(0.6) # Short pause for visual effect
+        
+        st.write("🏛️ **Gate 2:** Resolving server-side regulatory entity profile...")
+        time.sleep(0.6)
+        
+        st.write("⏱️ **Gate 3:** Calculating record age against statutory retention bounds...")
+        time.sleep(0.6)
+        
+        st.write("🔐 **Gate 4:** Evaluating cross-record plaintext dependencies...")
+        time.sleep(0.6)
+        
+        # Actually hit the API here
         response = client.post("/api/v1/consent/revoke", json=payload)
         
-        st.subheader("2. Engine Decision")
+        status.update(label="Statutory Evaluation Complete", state="complete", expanded=False)
+
+    # --- Render Results ---
+    st.subheader("⚖️ Final Legal Verdict")
+    
+    if response.status_code == 200:
+        result = response.json()
+        action = result.get("action_executed", "")
         
-        if response.status_code == 200:
-            result = response.json()
-            action = result.get("action_executed", "")
+        # Bold, card-like result displays
+        if "HARD_DELETE" in action:
+            st.success(f"✅ **ACTION: {action}**")
+            st.info("The data has been permanently erased under DPDP Act Sec 8(7). No statutory retention overrides apply.")
+        elif "DECLINE" in action:
+            st.error(f"🚫 **ACTION: {action}**")
+            st.warning("Erasure blocked under DPDP Sec 6(5)/(6). Cannot delete data tied to an active, in-transit operation.")
+        elif "PRESERVE" in action:
+            st.warning(f"🛡️ **ACTION: {action}**")
+            st.info("Record preserved due to statutory mandate (e.g., PMLA, CGST). Identity encrypted if no other active dependency exists.")
             
-            # Color-coded visual feedback based on the decision
-            if "HARD_DELETE" in action:
-                st.success(f"✅ **{action}**")
-                st.info("Decision: Data successfully erased under Sec 8(7). No overriding retention laws apply.")
-            elif "DECLINE" in action:
-                st.error(f"🚫 **{action}**")
-                st.info("Decision: Erasure blocked under Sec 6(5)/(6) due to an active, in-transit operation.")
-            elif "PRESERVE" in action:
-                st.warning(f"🛡️ **{action}**")
-                st.info("Decision: Record preserved due to statutory mandate (e.g., PMLA, CGST). Identity encrypted if no other active operations require it.")
-            else:
-                st.info(f"ℹ️ **{action}**")
-                
-            st.markdown("### Raw API Response Ledger")
+        # Hide the JSON inside an expander so it doesn't look like a raw spreadsheet
+        with st.expander("View Raw Audit Ledger (JSON)"):
             st.json(result)
             
-        else:
-            # Handle HTTP 500s (like the Fail Closed bug fix for unknown entities)
-            st.error(f"🚨 Request Failed (HTTP {response.status_code})")
-            st.markdown("This usually happens if the engine **fails closed** (e.g., unrecognized regulatory entity profile).")
+    else:
+        st.error(f"🚨 Engine Failed Closed (HTTP {response.status_code})")
+        with st.expander("View Error Details"):
             try:
                 st.json(response.json())
             except:
                 st.write(response.text)
+else:
+    # Default state before clicking the button
+    st.info("👈 Waiting for input. Use the Control Panel on the left to simulate a request.")
