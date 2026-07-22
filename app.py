@@ -28,7 +28,7 @@ with col2:
         "Target Record Type",
         [
             "live_order_data",
-            "marketing_data", 
+            "marketing_profile", 
             "pmla_identity_log", 
             "gst_invoice_record",
             "corporate_books"
