@@ -1,8 +1,4 @@
-# Verification checklist — do not skip this before using the project
-
-You are the one whose name goes on this. Everything below is organized by
-how confident you should be in *my* process, not how confident I sounded
-in conversation. Confidence in tone is not evidence.
+# Initial Verification checklist I had(just for references) -
 
 ## How to read the tiers
 
