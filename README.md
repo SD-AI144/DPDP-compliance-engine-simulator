@@ -1,32 +1,13 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/e095e369-5f17-4a6a-9bbb-c05e6d8bad78
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
-
 
 
 # DPDP 2027 Consent & Erasure Decision Engine
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-10%20passing-brightgreen.svg)](TestMain.py)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat&logo=vite&logoColor=FFD62E)
+![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=flat&logo=googlegemini&logoColor=white)
 
 A techno-legal architecture Proof-of-Concept (PoC) demonstrating how statutory consent revocation under India's **Digital Personal Data Protection (DPDP) Act, 2023** interacts with mandatory statutory retention periods across the **PMLA, 2002**, **CGST Act, 2017**, and **Companies Act, 2013**.
 
@@ -45,10 +26,38 @@ When a Data Principal revokes consent or requests data erasure under **Section 6
 2. **Statutory Override:** Erasure obligations yield to laws requiring data retention (**Section 8(7)**), such as tax logs, corporate books, or anti-money laundering records.
 3. **Selective Pseudonymization:** If financial or tax records must be preserved beyond consent revocation, shared identity fields must be encrypted unless an active operational dependency still requires plain text.
 
-This project implements a lightweight **FastAPI** service that receives a data erasure request, evaluates statutory conflict matrices, and determines whether to **Hard Delete**, **Decline**, or **Preserve with Targeted Pseudonymization/Encryption**.
+This project implements a TypeScript-based Node.js web application (deployed via Google AI Studio) that receives a data erasure request, evaluates statutory conflict matrices, and determines whether to **Hard Delete**, **Decline**, or **Preserve with Targeted Pseudonymization/Encryption**.
 
 ---
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/e095e369-5f17-4a6a-9bbb-c05e6d8bad78
+
+## Tech Stack & Architecture
+
+This project has been transitioned to a modern web architecture integrated with Google AI Studio:
+
+* **Frontend & Tooling:** Built with **TypeScript** for type-safe logic and **Vite** for rapid bundling and development.
+* **Environment:** Powered by **Node.js**.
+* **AI Integration:** Utilizes the **Google Gemini API** (via Google AI Studio) to process natural language inputs and execute complex statutory decision logic.
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
+---
 ## Architectural Decision Logic
 
 ```mermaid
